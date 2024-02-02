@@ -31,9 +31,9 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    'api.apps.ApiConfig'
-    'recipes.apps.RecipesConfig'
-    'users.apps.UsersConfig'
+    'recipes.apps.RecipesConfig',
+    'api.apps.ApiConfig',
+    'users.apps.UsersConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
