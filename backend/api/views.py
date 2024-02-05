@@ -5,7 +5,6 @@ from users.models import CustomUser
 from .serializers import (
     IngredientSerializer,
     TagSerializer,
-    CustomUserSerializer,
     UserRegistrationSerializer
 )
 
