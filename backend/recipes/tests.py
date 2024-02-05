@@ -18,3 +18,4 @@ class IngredientModelTestCase(TestCase):
 
     def test_delete_ingredient(self):
         self.ingredient.delete()
+
