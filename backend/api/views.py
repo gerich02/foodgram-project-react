@@ -1,21 +1,16 @@
 from django.shortcuts import get_object_or_404
-from django.http import HttpResponse
-from rest_framework import permissions, viewsets
+from rest_framework import permissions, viewsets, status
 from rest_framework.decorators import action
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.response import Response
 from djoser.views import UserViewSet
-from rest_framework.permissions import (SAFE_METHODS, AllowAny,
-                                        IsAuthenticated,
-                                        IsAuthenticatedOrReadOnly)
+
 from recipes.models import Ingredient, Tag, Recipe
 from users.models import CustomUser, Follow
-from .permissions import IsAdminOrOwner
 from .serializers import (
     IngredientSerializer,
     TagSerializer,
     RecipeCreateSerializer,
-    UserCreateSerializer,
     UserInfoSerializer,
     SubscriptionsSerializer
 )
@@ -25,14 +20,12 @@ class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
     pagination_class = None
-    permission_classes = (AllowAny,)
 
 
 class TagViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
     pagination_class = None
-    permission_classes = (AllowAny,)
 
 
 class RecipeViewSet(viewsets.ModelViewSet):
@@ -42,21 +35,17 @@ class RecipeViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
 
+
 class CustomUserViewSet(UserViewSet):
     """Вьюсет для модели пользователя."""
+
     queryset = CustomUser.objects.all()
-    permission_classes = (AllowAny,)
+    serializer_class = UserInfoSerializer
     pagination_class = LimitOffsetPagination
-    
-    def get_serializer_class(self):
-        """Функция получения нужного сериализатора."""
-        if self.request.method == 'GET':
-            return UserInfoSerializer
-        return UserCreateSerializer
 
     @action(detail=True,
             methods=['post', 'delete'],
-            permission_classes=[IsAuthenticated])
+            permission_classes=[permissions.IsAuthenticated])
     def subscribe(self, request, **kwargs):
         """Функция подписки на пользователя."""
         user = request.user
@@ -78,7 +67,7 @@ class CustomUserViewSet(UserViewSet):
 
     @action(detail=False,
             methods=['get'],
-            permission_classes=[IsAuthenticated])
+            permission_classes=[permissions.IsAuthenticated])
     def subscriptions(self, request):
         """Функция выдачи пользователей, на которых подписан автор запроса."""
         user = request.user
