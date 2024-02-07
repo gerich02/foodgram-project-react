@@ -122,7 +122,7 @@ class RecipeIngredient(models.Model):
         default_related_name = 'recipe_ingredients'
 
 
-class Favourite(models.Model):
+class Favorite(models.Model):
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
