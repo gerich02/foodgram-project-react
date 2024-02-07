@@ -1,4 +1,5 @@
 from django.db.models import Sum
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers, status
 from djoser.serializers import UserCreateSerializer
@@ -55,6 +56,28 @@ class TagSerializer(serializers.ModelSerializer):
         model = Tag
         fields = ('id', 'name', 'color', 'slug')
 
+class IngredientInRecipeCreateSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField()
+    amount = serializers.IntegerField(
+        validators=[
+            MinValueValidator(1, message='Минимум: '
+                              '1 единица'),
+            MaxValueValidator(1000, message='Максимум: '
+                              '1000 единиц')
+        ]
+    )
+
+    class Meta:
+        model = RecipeIngredient
+        fields = (
+            'id',
+            'amount'
+        )
+
+    def validate_id(self, value):
+        if not Ingredient.objects.filter(id=value).exists():
+            raise serializers.ValidationError('Ингредиент не существует')
+        return value
 
 class UserCreateSerializer(UserCreateSerializer):
 
@@ -170,31 +193,33 @@ class RecipeSerializer(serializers.ModelSerializer):
         tags_ids = self.initial_data.get('tags')
         if not tags_ids:
             raise ValidationError('Необходимо указать хотя бы один тег')
-        tags = Tag.objects.filter(id__in=tags_ids)
-        if len(tags) != len(set(tags)):
+        if len(tags_ids) != len(set(tags_ids)):
             raise ValidationError('Теги не должны повторяться')
+        if not Tag.objects.filter(id__in=tags_ids).exists():
+            raise ValidationError('Один или несколько указанных тегов не существуют')
+        tags = Tag.objects.filter(id__in=tags_ids)
         ingredients = self.initial_data.get('ingredients')
         if not ingredients:
             raise ValidationError('Необходимо указать хотя бы один ингредиент')
-        ingredient_id = [ingredient.get('id') for ingredient in ingredients]
-        if len(ingredient_id) != len(set(ingredient_id)):
-            raise ValidationError(
-                'Ингредиенты уже были добавлены в рецепт'
-            )
+        ingredient_ids = [ingredient.get('id') for ingredient in ingredients]
+        if not Ingredient.objects.filter(pk__in=ingredient_ids).exists():
+            raise ValidationError('Один или несколько указанных ингредиентов не существуют')
+        if len(ingredient_ids) != len(set(ingredient_ids)):
+            raise ValidationError('Ингредиенты уже были добавлены в рецепт')
         valid_ingredients = {}
         for ingredient in ingredients:
             valid_ingredients[ingredient['id']] = int(ingredient['amount'])
             if int(ingredient['amount']) <= 0:
-                raise ValidationError(
-                    'Количество ингредиента должно быть больше нуля')
-        ingredient_objects = (Ingredient.objects.filter(
-            pk__in=valid_ingredients))
+                raise ValidationError('Количество ингредиента должно быть больше нуля')
+        ingredient_objects = Ingredient.objects.filter(pk__in=valid_ingredients.keys())
         for ingredient_object in ingredient_objects:
             valid_ingredients[ingredient_object.pk] = (
                 ingredient_object, valid_ingredients[ingredient_object.pk])
-        data.update({'tags': tags,
-                     'ingredients': valid_ingredients,
-                     'author': self.context.get('request').user})
+        data.update({
+            'tags': tags,
+            'ingredients': valid_ingredients,
+            'author': self.context.get('request').user
+        })
         return data
 
     def create(self, validated_data):
