@@ -9,18 +9,20 @@ from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.response import Response
 
 from api.filters import IngredientFilter, RecipeFilter
+from api.permissions import IsOwnerOrAdminOrReadOnly
+from api.serializers import (IngredientSerializer, RecipeSerializer,
+                             SpecialRecipeSerializer,
+                             SubscriptionDataSerializer,
+                             SubscriptionSerializer, TagSerializer,
+                             UserInfoSerializer)
 from recipes.models import (Favorite, Ingredient, Recipe, RecipeIngredient,
                             ShoppingCart, Tag)
 from users.models import CustomUser, Follow
 
-from .permissions import IsOwnerOrAdminOrReadOnly
-from .serializers import (IngredientSerializer, RecipeSerializer,
-                          SpecialRecipeSerializer, SubscriptionDataSerializer,
-                          SubscriptionSerializer, TagSerializer,
-                          UserInfoSerializer)
-
 
 class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
+    """Вьюсет для просмотра списка ингредиентов."""
+
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
     pagination_class = None
@@ -29,6 +31,8 @@ class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class TagViewSet(viewsets.ReadOnlyModelViewSet):
+    """Вьюсет для просмотра списка тегов."""
+
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
     pagination_class = None
@@ -112,14 +116,12 @@ class RecipeViewSet(viewsets.ModelViewSet):
     filter_backends = (DjangoFilterBackend,)
 
     def perform_create(self, serializer):
-        """Функция сохранения пользователя как автора при создании рецепта."""
         serializer.save(author=self.request.user)
 
     @action(detail=True,
             methods=['post', 'delete'],
             permission_classes=[permissions.IsAuthenticated])
     def favorite(self, request, pk):
-        """Функция добавления рецепта в избранное."""
         if request.method == 'POST':
             try:
                 recipe = Recipe.objects.get(id=pk)
@@ -147,7 +149,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
             methods=['post', 'delete'],
             permission_classes=[permissions.IsAuthenticated])
     def shopping_cart(self, request, pk):
-        """Функция добавления рецепта в продуктовую корзину."""
         if request.method == 'POST':
             try:
                 recipe = Recipe.objects.get(id=pk)
@@ -173,7 +174,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
             methods=['get'],
             permission_classes=[permissions.IsAuthenticated])
     def download_shopping_cart(self, request):
-        """Функция загрузки продуктовой корзины пользователя."""
         if not request.user.shopping_cart_recipe.exists():
             return Response(status=status.HTTP_400_BAD_REQUEST)
         ingredients = RecipeIngredient.objects.filter(

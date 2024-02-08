@@ -1,11 +1,17 @@
 import csv
 
 from django.core.management.base import BaseCommand
-
 from recipes.models import Tag
 
 
 class Command(BaseCommand):
+    """
+    Команда для импорта данных о тэгах из CSV файла в базу данных.
+
+    Attributes:
+        help (str): Справочное сообщение о назначении команды.
+    """
+
     help = 'Ипорт данных из csv файла в бд'
 
     def add_arguments(self, parser):

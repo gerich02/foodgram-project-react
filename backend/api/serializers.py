@@ -9,11 +9,17 @@ from rest_framework import serializers
 from rest_framework.exceptions import AuthenticationFailed, ValidationError
 from rest_framework.validators import UniqueTogetherValidator
 
+from api.constants import (MAX_INGREDIENT_AMOUNT,
+                           MIN_INGREDIENT_AMOUNT,
+                           MIN_INGREDIENT_REQUIRED,
+                           MIN_TAG_REQUIRED)
 from recipes.models import Ingredient, Recipe, RecipeIngredient, Tag
 from users.models import CustomUser, Follow
 
 
 class Base64ImageField(serializers.ImageField):
+    """Класс для загрузки изображений в формате base64."""
+
     def to_internal_value(self, data):
 
         if isinstance(data, str) and data.startswith('data:image'):
@@ -25,6 +31,8 @@ class Base64ImageField(serializers.ImageField):
 
 
 class Hex2NameColor(serializers.Field):
+    """Класс для преобразования цвета в формате HEX в имя цвета."""
+
     def to_representation(self, value):
         return value
     
@@ -37,6 +45,7 @@ class Hex2NameColor(serializers.Field):
 
 
 class IngredientSerializer(serializers.ModelSerializer):
+    """Сериализатор для модели ингредиента."""
 
     class Meta:
         model = Ingredient
@@ -44,6 +53,8 @@ class IngredientSerializer(serializers.ModelSerializer):
 
 
 class TagSerializer(serializers.ModelSerializer):
+    """ Сериализатор для модели тега."""
+
     color = Hex2NameColor()
 
     class Meta:
@@ -52,13 +63,15 @@ class TagSerializer(serializers.ModelSerializer):
 
 
 class IngredientInRecipeCreateSerializer(serializers.ModelSerializer):
+    """Сериализатор для создания ингредиентов в рецепте."""
+
     id = serializers.IntegerField()
     amount = serializers.IntegerField(
         validators=[
-            MinValueValidator(1, message='Минимум: '
-                              '1 единица'),
-            MaxValueValidator(1000, message='Максимум: '
-                              '1000 единиц')
+            MinValueValidator(MIN_INGREDIENT_AMOUNT, message='Минимум: '
+                              f'{MIN_INGREDIENT_AMOUNT} единица'),
+            MaxValueValidator(MAX_INGREDIENT_AMOUNT, message='Максимум: '
+                              f'{MAX_INGREDIENT_AMOUNT} единиц')
         ]
     )
 
@@ -76,6 +89,7 @@ class IngredientInRecipeCreateSerializer(serializers.ModelSerializer):
 
 
 class UserCreateSerializer(UserCreateSerializer):
+    """Сериализатор для создания пользователя."""
 
     class Meta:
         model = CustomUser
@@ -90,6 +104,8 @@ class UserCreateSerializer(UserCreateSerializer):
     
 
 class UserInfoSerializer(UserCreateSerializer):
+    """Сериализатор для получения информации о пользователе."""
+
     first_name = serializers.CharField(required=False)
     last_name = serializers.CharField(required=False)
     is_subscribed = serializers.SerializerMethodField()
@@ -172,7 +188,9 @@ class RecipeSerializer(serializers.ModelSerializer):
             )
         tags_ids = self.initial_data.get('tags') 
         if not tags_ids:
-            raise ValidationError('Необходимо указать хотя бы один тег')
+            raise ValidationError(
+                f'Необходимо указать хотя бы {MIN_TAG_REQUIRED} тег'
+            )
         if len(tags_ids) != len(set(tags_ids)):
             raise ValidationError('Теги не должны повторяться')
         if not Tag.objects.filter(id__in=tags_ids).exists():
@@ -182,7 +200,10 @@ class RecipeSerializer(serializers.ModelSerializer):
         tags = Tag.objects.filter(id__in=tags_ids)
         ingredients = self.initial_data.get('ingredients')
         if not ingredients:
-            raise ValidationError('Необходимо указать хотя бы один ингредиент')
+            raise ValidationError(
+                'Необходимо указать минимум '
+                f'{MIN_INGREDIENT_REQUIRED} ингредиент'
+            )
         ingredient_ids = [ingredient.get('id') for ingredient in ingredients]
         if not Ingredient.objects.filter(pk__in=ingredient_ids).exists():
             raise ValidationError(
@@ -241,6 +262,8 @@ class RecipeSerializer(serializers.ModelSerializer):
 
 
 class SpecialRecipeSerializer(serializers.ModelSerializer):
+    """Сериализатор для добавления рецепта в избранное и корзину."""
+
     name = serializers.ReadOnlyField(
         help_text='Название рецепта'
     )
@@ -263,6 +286,8 @@ class SpecialRecipeSerializer(serializers.ModelSerializer):
 
 
 class SubscriptionSerializer(UserInfoSerializer):
+    """Сериализатор для получения информации о подписках."""
+
     recipes = serializers.SerializerMethodField(read_only=True)
     recipes_count = serializers.ReadOnlyField(source='recipes.count')
 
@@ -292,6 +317,7 @@ class SubscriptionSerializer(UserInfoSerializer):
 
 
 class SubscriptionDataSerializer(serializers.ModelSerializer):
+    """Сериализатор для подписки/отмены подписки на пользователя."""
 
     class Meta:
         model = Follow
@@ -321,5 +347,3 @@ class SubscriptionDataSerializer(serializers.ModelSerializer):
             context=self.context
         )
         return serializer.data
-
-

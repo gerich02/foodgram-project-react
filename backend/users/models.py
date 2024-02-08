@@ -6,6 +6,8 @@ from api.constants import USER_VALID_MESSAGE, USERS_NAME_EMAIL_PASS_MAX_LENGTH
 
 
 class CustomUser(AbstractUser):
+    """Модель пользователя."""
+
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username', 'first_name', 'last_name']
     email = models.EmailField('Электронная почта', unique=True)
@@ -42,6 +44,8 @@ class CustomUser(AbstractUser):
     
 
 class Follow(models.Model):
+    """Модель подписки."""
+
     user = models.ForeignKey(
         CustomUser,
         on_delete=models.CASCADE,

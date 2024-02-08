@@ -4,6 +4,8 @@ from recipes.models import Ingredient, Recipe
 
 
 class RecipeFilter(FilterSet):
+    """Фильтр для модели рецептов"""
+
     tags = filters.AllValuesMultipleFilter(
         field_name='tags__slug'
     )
@@ -32,6 +34,8 @@ class RecipeFilter(FilterSet):
 
 
 class IngredientFilter(FilterSet):
+    """Фильтр для модели ингредиентов"""
+
     name = filters.CharFilter(lookup_expr='startswith')
 
     class Meta:

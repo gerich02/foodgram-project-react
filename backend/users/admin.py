@@ -6,12 +6,16 @@ from users.models import CustomUser, Follow
 
 
 class BaseAdmin(admin.ModelAdmin):
+    """Базовый класс для настроек административного интерфейса."""
+
     empty_value_display = '-'
     list_per_page = PAGE_LIMIT
 
 
 @admin.register(CustomUser)
 class CustomUserAdmin(UserAdmin):
+    """Класс для настройки административного интерфейса пользователей."""
+
     list_display = (
         'username',
         'first_name',
@@ -25,6 +29,8 @@ class CustomUserAdmin(UserAdmin):
 
 @admin.register(Follow)
 class FollowAdmin(BaseAdmin):
+    """Класс для настройки административного интерфейса подписок."""
+
     list_display = (
         'user',
         'following',
