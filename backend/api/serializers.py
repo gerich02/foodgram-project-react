@@ -23,8 +23,8 @@ class Base64ImageField(serializers.ImageField):
     def to_internal_value(self, data):
 
         if isinstance(data, str) and data.startswith('data:image'):
-            format, imgstr = data.split(';base64,')  
-            ext = format.split('/')[-1]  
+            format, imgstr = data.split(';base64,')
+            ext = format.split('/')[-1]
             data = ContentFile(base64.b64decode(imgstr), name='temp.' + ext)
 
         return super().to_internal_value(data)
@@ -35,7 +35,7 @@ class Hex2NameColor(serializers.Field):
 
     def to_representation(self, value):
         return value
-    
+
     def to_internal_value(self, data):
         try:
             data = webcolors.hex_to_name(data)
@@ -53,7 +53,7 @@ class IngredientSerializer(serializers.ModelSerializer):
 
 
 class TagSerializer(serializers.ModelSerializer):
-    """ Сериализатор для модели тега."""
+    """Сериализатор для модели тега."""
 
     color = Hex2NameColor()
 
@@ -101,7 +101,7 @@ class UserCreateSerializer(UserCreateSerializer):
             'last_name',
             'password'
         )
-    
+
 
 class UserInfoSerializer(UserCreateSerializer):
     """Сериализатор для получения информации о пользователе."""
@@ -127,7 +127,7 @@ class UserInfoSerializer(UserCreateSerializer):
             request and request.user.is_authenticated
             and request.user.follower.filter(following=obj).exists()
         )
-    
+
 
 class RecipeSerializer(serializers.ModelSerializer):
     """Сериализатор модели рецепта."""
@@ -167,7 +167,7 @@ class RecipeSerializer(serializers.ModelSerializer):
             'amount',
             'measurement_unit'
         )
-    
+
     def get_is_favorited(self, obj):
         user = self.context.get('request').user
         if user.is_authenticated:
@@ -186,7 +186,7 @@ class RecipeSerializer(serializers.ModelSerializer):
             raise AuthenticationFailed(
                 "Требуется аутентификация для выполнения этого действия"
             )
-        tags_ids = self.initial_data.get('tags') 
+        tags_ids = self.initial_data.get('tags')
         if not tags_ids:
             raise ValidationError(
                 f'Необходимо указать хотя бы {MIN_TAG_REQUIRED} тег'

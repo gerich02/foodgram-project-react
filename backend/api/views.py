@@ -93,7 +93,7 @@ class CustomUserViewSet(UserViewSet):
             context={'request': request}
         )
         return self.get_paginated_response(serializer.data)
-    
+
     @action(
         detail=False,
         methods=['GET'],
@@ -103,7 +103,7 @@ class CustomUserViewSet(UserViewSet):
         user = request.user
         serializer = UserInfoSerializer(user, context={'request': request})
         return Response(serializer.data, status=status.HTTP_200_OK)
-    
+
 
 class RecipeViewSet(viewsets.ModelViewSet):
     """Вьюсет для модели рецепта."""

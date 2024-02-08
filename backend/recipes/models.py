@@ -54,7 +54,7 @@ class Ingredient(models.Model):
 
     def __str__(self):
         return f'{self.name} ({self.measurement_unit})'
-    
+
 
 class Recipe(models.Model):
     """Модель для хранения рецептов."""
@@ -78,7 +78,7 @@ class Recipe(models.Model):
         Ingredient,
         through='RecipeIngredient',
         verbose_name='Ингредиенты'
-        )
+    )
     slug = models.SlugField(verbose_name='Слаг')
     pub_date = models.DateTimeField(
         verbose_name='Дата публикации',
