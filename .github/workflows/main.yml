@@ -135,8 +135,8 @@ jobs:
           sudo docker compose -f docker-compose.production.yml down
           sudo docker compose -f docker-compose.production.yml up -d
           sudo docker compose -f docker-compose.production.yml exec backend python manage.py migrate
-          sudo docker compose -f docker-compose.production.yml exec backend python manage.py load_ingredient_csv
-          sudo docker compose -f docker-compose.production.yml exec backend python manage.py load_tags_csv
+          sudo docker compose -f docker-compose.production.yml exec backend python manage.py import_ingredient_csv
+          sudo docker compose -f docker-compose.production.yml exec backend python manage.py import_tags_csv
           sudo docker compose -f docker-compose.production.yml exec backend python manage.py collectstatic
           sudo docker compose -f docker-compose.production.yml exec backend cp -r /app/collected_static/. /backend_static/static/ 
 
