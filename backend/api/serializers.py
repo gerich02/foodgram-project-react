@@ -1,9 +1,10 @@
 from django.db.models import Sum
+
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers, status
 from djoser.serializers import UserCreateSerializer
-from rest_framework.exceptions import ValidationError
+from rest_framework.exceptions import ValidationError, AuthenticationFailed
 from rest_framework.validators import UniqueTogetherValidator
 import base64 
 from recipes.models import (
@@ -164,33 +165,12 @@ class RecipeSerializer(serializers.ModelSerializer):
             return user.shopping_cart_recipe.filter(recipe=obj).exists()
         return False
 
-    # def validate(self, data):
-    #     ingredients = data.get('ingredients', [])
-    #     tags = data.get('tags', [])
-    #     image = data.get('image')
-    #     if not tags:
-    #         raise serializers.ValidationError(
-    #             'В рецепте должен быть использован '
-    #             f'хотя бы 1 тег'
-    #         )
-    #     if len(tags) != len(set(tags)):
-    #         raise serializers.ValidationError('Теги не должны повторяться')
-    #     if not ingredients:
-    #         raise serializers.ValidationError(
-    #             'В рецепт должен быть добавлен хотя бы '
-    #             f'1 ингредиент'
-    #         )
-    #     ingredient_id = [ingredient.get('id') for ingredient in ingredients]
-    #     if len(ingredient_id) != len(set(ingredient_id)):
-    #         raise serializers.ValidationError(
-    #             'Ингредиенты уже были добавлены в рецепт'
-    #         )
-    #     if not image:
-    #         raise serializers.ValidationError('Добавьте изображение')
-    #     return data
 
     def validate(self, data):
-        tags_ids = self.initial_data.get('tags')
+        user = self.context.get('request').user
+        if user.is_anonymous:
+            raise AuthenticationFailed("Требуется аутентификация для выполнения этого действия")
+        tags_ids = self.initial_data.get('tags') 
         if not tags_ids:
             raise ValidationError('Необходимо указать хотя бы один тег')
         if len(tags_ids) != len(set(tags_ids)):
@@ -272,7 +252,6 @@ class SpecialRecipeSerializer(serializers.ModelSerializer):
             'cooking_time',
             'image'
         )
-
 
 class SubscriptionSerializer(UserInfoSerializer):
     recipes = serializers.SerializerMethodField(read_only=True)

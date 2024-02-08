@@ -124,10 +124,20 @@ class RecipeViewSet(viewsets.ModelViewSet):
     def favorite(self, request, pk):
         """Функция добавления рецепта в избранное."""
         if request.method == 'POST':
-            recipe = get_object_or_404(Recipe, id=pk)
+            try:
+                recipe = Recipe.objects.get(id=pk)
+            except Recipe.DoesNotExist:
+                return Response(
+                    {'errors': 'Такого рецепта не существует'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            if Favorite.objects.filter(user=request.user,
+                                           recipe=recipe).exists():
+                return Response(status=status.HTTP_400_BAD_REQUEST)
             Favorite.objects.create(user=request.user, recipe=recipe)
             serializer = SpecialRecipeSerializer(recipe)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
+        recipe = get_object_or_404(Recipe, id=pk)
         favorite = Favorite.objects.filter(user=request.user, recipe__id=pk)
         if favorite.exists():
             favorite.delete()
@@ -140,13 +150,20 @@ class RecipeViewSet(viewsets.ModelViewSet):
     def shopping_cart(self, request, pk):
         """Функция добавления рецепта в продуктовую корзину."""
         if request.method == 'POST':
-            recipe = get_object_or_404(Recipe, id=pk)
+            try:
+                recipe = Recipe.objects.get(id=pk)
+            except Recipe.DoesNotExist:
+                return Response(
+                    {'errors': 'Такого рецепта не существует'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
             if ShoppingCart.objects.filter(user=request.user,
                                            recipe=recipe).exists():
                 return Response(status=status.HTTP_400_BAD_REQUEST)
             ShoppingCart.objects.create(user=request.user, recipe=recipe)
             serializer = SpecialRecipeSerializer(recipe)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
+        recipe = get_object_or_404(Recipe, id=pk)
         cart = ShoppingCart.objects.filter(user=request.user, recipe__id=pk)
         if cart.exists():
             cart.delete()
