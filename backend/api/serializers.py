@@ -9,10 +9,8 @@ from rest_framework import serializers
 from rest_framework.exceptions import AuthenticationFailed, ValidationError
 from rest_framework.validators import UniqueTogetherValidator
 
-from api.constants import (MAX_INGREDIENT_AMOUNT,
-                           MIN_INGREDIENT_AMOUNT,
-                           MIN_INGREDIENT_REQUIRED,
-                           MIN_TAG_REQUIRED)
+from api.constants import (MAX_INGREDIENT_AMOUNT, MIN_INGREDIENT_AMOUNT,
+                           MIN_INGREDIENT_REQUIRED, MIN_TAG_REQUIRED)
 from recipes.models import Ingredient, Recipe, RecipeIngredient, Tag
 from users.models import CustomUser, Follow
 
