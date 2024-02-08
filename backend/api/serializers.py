@@ -1,23 +1,15 @@
-from django.db.models import Sum
+import base64
 
-from django.core.validators import MaxValueValidator, MinValueValidator
-from django.shortcuts import get_object_or_404
-from rest_framework import serializers, status
-from djoser.serializers import UserCreateSerializer
-from rest_framework.exceptions import ValidationError, AuthenticationFailed
-from rest_framework.validators import UniqueTogetherValidator
-import base64 
-from recipes.models import (
-    Ingredient,
-    Tag,
-    Recipe,
-    RecipeIngredient,
-    Favorite,
-    ShoppingCart
-)
-from users.models import CustomUser, Follow
 import webcolors
 from django.core.files.base import ContentFile
+from django.core.validators import MaxValueValidator, MinValueValidator
+from django.db.models import Sum
+from djoser.serializers import UserCreateSerializer
+from recipes.models import Ingredient, Recipe, RecipeIngredient, Tag
+from rest_framework import serializers
+from rest_framework.exceptions import AuthenticationFailed, ValidationError
+from rest_framework.validators import UniqueTogetherValidator
+from users.models import CustomUser, Follow
 
 
 class Base64ImageField(serializers.ImageField):
@@ -57,6 +49,7 @@ class TagSerializer(serializers.ModelSerializer):
         model = Tag
         fields = ('id', 'name', 'color', 'slug')
 
+
 class IngredientInRecipeCreateSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField()
     amount = serializers.IntegerField(
@@ -79,6 +72,7 @@ class IngredientInRecipeCreateSerializer(serializers.ModelSerializer):
         if not Ingredient.objects.filter(id=value).exists():
             raise serializers.ValidationError('Ингредиент не существует')
         return value
+
 
 class UserCreateSerializer(UserCreateSerializer):
 
@@ -148,10 +142,14 @@ class RecipeSerializer(serializers.ModelSerializer):
         )
 
     def get_ingredients(self, obj):
-        ingredients = obj.ingredients.annotate(
+        return obj.ingredients.annotate(
             amount=Sum('recipe_ingredients__amount')
-        ).values('id', 'name', 'amount', 'measurement_unit')
-        return ingredients
+        ).values(
+            'id',
+            'name',
+            'amount',
+            'measurement_unit'
+        )
     
     def get_is_favorited(self, obj):
         user = self.context.get('request').user
@@ -165,33 +163,42 @@ class RecipeSerializer(serializers.ModelSerializer):
             return user.shopping_cart_recipe.filter(recipe=obj).exists()
         return False
 
-
     def validate(self, data):
         user = self.context.get('request').user
         if user.is_anonymous:
-            raise AuthenticationFailed("Требуется аутентификация для выполнения этого действия")
+            raise AuthenticationFailed(
+                "Требуется аутентификация для выполнения этого действия"
+            )
         tags_ids = self.initial_data.get('tags') 
         if not tags_ids:
             raise ValidationError('Необходимо указать хотя бы один тег')
         if len(tags_ids) != len(set(tags_ids)):
             raise ValidationError('Теги не должны повторяться')
         if not Tag.objects.filter(id__in=tags_ids).exists():
-            raise ValidationError('Один или несколько указанных тегов не существуют')
+            raise ValidationError(
+                'Один или несколько указанных тегов не существуют'
+            )
         tags = Tag.objects.filter(id__in=tags_ids)
         ingredients = self.initial_data.get('ingredients')
         if not ingredients:
             raise ValidationError('Необходимо указать хотя бы один ингредиент')
         ingredient_ids = [ingredient.get('id') for ingredient in ingredients]
         if not Ingredient.objects.filter(pk__in=ingredient_ids).exists():
-            raise ValidationError('Один или несколько указанных ингредиентов не существуют')
+            raise ValidationError(
+                'Один или несколько указанных ингредиентов не существуют'
+            )
         if len(ingredient_ids) != len(set(ingredient_ids)):
             raise ValidationError('Ингредиенты уже были добавлены в рецепт')
         valid_ingredients = {}
         for ingredient in ingredients:
             valid_ingredients[ingredient['id']] = int(ingredient['amount'])
             if int(ingredient['amount']) <= 0:
-                raise ValidationError('Количество ингредиента должно быть больше нуля')
-        ingredient_objects = Ingredient.objects.filter(pk__in=valid_ingredients.keys())
+                raise ValidationError(
+                    'Количество ингредиента должно быть больше нуля'
+                )
+        ingredient_objects = Ingredient.objects.filter(
+            pk__in=valid_ingredients.keys()
+        )
         for ingredient_object in ingredient_objects:
             valid_ingredients[ingredient_object.pk] = (
                 ingredient_object, valid_ingredients[ingredient_object.pk])
@@ -253,6 +260,7 @@ class SpecialRecipeSerializer(serializers.ModelSerializer):
             'image'
         )
 
+
 class SubscriptionSerializer(UserInfoSerializer):
     recipes = serializers.SerializerMethodField(read_only=True)
     recipes_count = serializers.ReadOnlyField(source='recipes.count')
@@ -281,6 +289,7 @@ class SubscriptionSerializer(UserInfoSerializer):
         )
         return serializer.data
 
+
 class SubscriptionDataSerializer(serializers.ModelSerializer):
 
     class Meta:
@@ -300,7 +309,9 @@ class SubscriptionDataSerializer(serializers.ModelSerializer):
     def validate(self, data):
         request = self.context.get('request')
         if request.user == data.get('following'):
-            raise serializers.ValidationError('Нельзя подписаться на самого себя')
+            raise serializers.ValidationError(
+                'Нельзя подписаться на самого себя'
+            )
         return data
 
     def to_representation(self, instance):

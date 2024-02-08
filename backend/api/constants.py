@@ -1,0 +1,25 @@
+USERS_NAME_EMAIL_PASS_MAX_LENGTH = 150
+USER_VALID_MESSAGE = 'Введите правильное значение.'
+PAGE_LIMIT = 20
+MAX_LENGTH_NAME = 200
+
+
+
+MAX_LENGTH_EMAIL = 254
+MAX_LENGTH_NAME = 200
+MAX_LENGTH_FOR_NAME_AND_SLUG = 50
+MAX_LENGTH_COLOR = 7
+MIN_COUNT = 1
+MAX_COUNT = 1000
+MAX_TIME = 32000
+PAGE_LIMIT = 20
+PAGE_SIZE = 6
+PAGE_SIZE_QUERY_PARAM = 'limit'
+PAGE_QUERY_PARAM = 'page'
+TEXT_LIMIT = 30
+DUPLICATE_SUBSCRIPTION_ERROR = 'Вы уже подписаны'
+SELF_SUBSCRIPTION_ERROR = 'Нельзя подписаться на самого себя'
+USERNAME_SPECIAL_SYMBOLS_ERROR = (
+    'Имя пользователя не может содержать специальные символы'
+)
+USERNAME_NOT_ME_ERROR = "Имя пользователя не может быть 'me'"

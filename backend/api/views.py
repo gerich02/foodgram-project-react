@@ -1,26 +1,22 @@
-from django.shortcuts import get_object_or_404
+from api.filters import IngredientFilter, RecipeFilter
 from django.db.models import Sum
 from django.http import HttpResponse
-from rest_framework import permissions, viewsets, status
+from django.shortcuts import get_object_or_404
+from django_filters.rest_framework import DjangoFilterBackend
+from djoser.views import UserViewSet
+from recipes.models import (Favorite, Ingredient, Recipe, RecipeIngredient,
+                            ShoppingCart, Tag)
+from rest_framework import permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.response import Response
-from django_filters.rest_framework import DjangoFilterBackend
-from djoser.views import UserViewSet
-from api.filters import IngredientFilter, RecipeFilter
-
-from recipes.models import Ingredient, Tag, Recipe, Favorite, ShoppingCart, RecipeIngredient
 from users.models import CustomUser, Follow
-from .serializers import (
-    IngredientSerializer,
-    TagSerializer,
-    RecipeSerializer,
-    UserInfoSerializer,
-    SubscriptionSerializer,
-    SubscriptionDataSerializer,
-    SpecialRecipeSerializer
-)
+
 from .permissions import IsOwnerOrAdminOrReadOnly
+from .serializers import (IngredientSerializer, RecipeSerializer,
+                          SpecialRecipeSerializer, SubscriptionDataSerializer,
+                          SubscriptionSerializer, TagSerializer,
+                          UserInfoSerializer)
 
 
 class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
@@ -131,8 +127,10 @@ class RecipeViewSet(viewsets.ModelViewSet):
                     {'errors': 'Такого рецепта не существует'},
                     status=status.HTTP_400_BAD_REQUEST
                 )
-            if Favorite.objects.filter(user=request.user,
-                                           recipe=recipe).exists():
+            if Favorite.objects.filter(
+                user=request.user,
+                recipe=recipe
+            ).exists():
                 return Response(status=status.HTTP_400_BAD_REQUEST)
             Favorite.objects.create(user=request.user, recipe=recipe)
             serializer = SpecialRecipeSerializer(recipe)
