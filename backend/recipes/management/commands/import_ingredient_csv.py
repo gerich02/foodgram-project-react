@@ -14,12 +14,8 @@ class Command(BaseCommand):
 
     help = 'Ипорт данных из csv файла в бд'
 
-    def add_arguments(self, parser):
-        parser.add_argument('file_path', type=str, help='Путь к CSV файлу')
-
     def handle(self, *args, **kwargs):
-        file_path = kwargs['file_path']
-        with open(file_path, 'r', encoding='utf-8') as file:
+        with open('data/ingredients.csv', encoding='utf-8') as file:
             reader = csv.reader(file)
             for row in reader:
                 name = row[0]
