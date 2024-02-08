@@ -23,7 +23,8 @@ class Command(BaseCommand):
                 color = row[1]
                 slug = row[2] if len(row) > 2 else None
 
-                if name:
+                existing_tag = Tag.objects.filter(name=name).exists()
+                if not existing_tag:
                     tag_instance = Tag(
                         name=name,
                         color=color,

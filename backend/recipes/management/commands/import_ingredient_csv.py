@@ -20,13 +20,15 @@ class Command(BaseCommand):
             reader = csv.reader(file)
             for row in reader:
                 name = row[0]
-
                 measurement_unit = row[1] if len(row) > 1 else None
-
-                ingredient_instance = Ingredient(
-                    name=name,
-                    measurement_unit=measurement_unit,
-                )
-                ingredient_instance.save()
+                existing_ingredient = Ingredient.objects.filter(
+                    name=name
+                ).exists()
+                if not existing_ingredient:
+                    ingredient_instance = Ingredient(
+                        name=name,
+                        measurement_unit=measurement_unit,
+                    )
+                    ingredient_instance.save()
 
         self.stdout.write(self.style.SUCCESS('Данные успешно импортированы'))
