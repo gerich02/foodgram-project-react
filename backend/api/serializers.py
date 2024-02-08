@@ -5,10 +5,11 @@ from django.core.files.base import ContentFile
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db.models import Sum
 from djoser.serializers import UserCreateSerializer
-from recipes.models import Ingredient, Recipe, RecipeIngredient, Tag
 from rest_framework import serializers
 from rest_framework.exceptions import AuthenticationFailed, ValidationError
 from rest_framework.validators import UniqueTogetherValidator
+
+from recipes.models import Ingredient, Recipe, RecipeIngredient, Tag
 from users.models import CustomUser, Follow
 
 

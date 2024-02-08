@@ -2,7 +2,7 @@ from django.contrib.auth.models import AbstractUser
 from django.core.validators import RegexValidator
 from django.db import models
 
-from api.constants import USERS_NAME_EMAIL_PASS_MAX_LENGTH, USER_VALID_MESSAGE
+from api.constants import USER_VALID_MESSAGE, USERS_NAME_EMAIL_PASS_MAX_LENGTH
 
 
 class CustomUser(AbstractUser):

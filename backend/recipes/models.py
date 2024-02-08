@@ -2,22 +2,26 @@ from django.contrib.auth import get_user_model
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 
+from api.constants import (MAX_COOKING_TIME, MAX_INGREDIENT_AMOUNT,
+                           MAX_LENGTH_COLOR, MAX_LENGTH_NAME_AND_SLUG,
+                           MIN_COOKING_TIME, MIN_INGREDIENT_AMOUNT)
+
 User = get_user_model()
 
 
 class Tag(models.Model):
     name = models.CharField(
-        max_length=200,
+        max_length=MAX_LENGTH_NAME_AND_SLUG,
         verbose_name='Название',
         unique=True
     )
     color = models.CharField(
-        max_length=7,
+        max_length=MAX_LENGTH_COLOR,
         verbose_name='Цвет в HEX',
         unique=True
     )
     slug = models.SlugField(
-        max_length=200,
+        max_length=MAX_LENGTH_NAME_AND_SLUG,
         verbose_name='Уникальный слаг',
         unique=True
     )
@@ -31,9 +35,12 @@ class Tag(models.Model):
 
 
 class Ingredient(models.Model):
-    name = models.CharField(max_length=200, verbose_name='Название')
+    name = models.CharField(
+        max_length=MAX_LENGTH_NAME_AND_SLUG,
+        verbose_name='Название'
+    )
     measurement_unit = models.CharField(
-        max_length=200,
+        max_length=MAX_LENGTH_NAME_AND_SLUG,
         verbose_name='Единицы измерения'
     )
 
@@ -52,7 +59,7 @@ class Recipe(models.Model):
         related_name='recipes',
         verbose_name='Автор')
     name = models.CharField(
-        max_length=200,
+        max_length=MAX_LENGTH_NAME_AND_SLUG,
         verbose_name='Название рецепта')
     text = models.TextField(verbose_name='Текст')
     image = models.ImageField(
@@ -80,12 +87,14 @@ class Recipe(models.Model):
         'Длительность приготовления',
         validators=[
             MinValueValidator(
-                1,
-                message='минимальное значение должно быть не менее 1 минуты'
+                MIN_COOKING_TIME,
+                message='Минимальное значение должно быть не менее '
+                f'{MIN_COOKING_TIME} минуты'
             ),
             MaxValueValidator(
-                360,
-                message='максимальное значение должно быть не более 360'
+                MAX_COOKING_TIME,
+                message='Максимальное значение должно быть не более '
+                f'{MAX_COOKING_TIME} минут'
             ),
         ]
     )
@@ -106,12 +115,14 @@ class RecipeIngredient(models.Model):
         'Количество',
         validators=[
             MinValueValidator(
-                1,
-                message='минимальное значение должно быть не менее 1'
+                MIN_INGREDIENT_AMOUNT,
+                message='Минимальное количество не менее '
+                f'{MIN_INGREDIENT_AMOUNT}'
             ),
             MaxValueValidator(
                 999,
-                message='максимальное значение должно быть не более 999'
+                message='Максимальное количество не более '
+                f'{MAX_INGREDIENT_AMOUNT}'
             ),
         ]
     )
