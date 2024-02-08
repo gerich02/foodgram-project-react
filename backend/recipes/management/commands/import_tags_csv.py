@@ -1,7 +1,5 @@
 import csv
-
 from django.core.management.base import BaseCommand
-
 from recipes.models import Tag
 
 
@@ -19,15 +17,16 @@ class Command(BaseCommand):
         with open('data/tags.csv', encoding='utf-8') as file:
             reader = csv.reader(file)
             for row in reader:
-                name = row[0],
-                color = row[1],
+                name = row[0]
+                color = row[1]
                 slug = row[2] if len(row) > 2 else None
 
-                ingredient_instance = Tag(
-                    name=name,
-                    color=color,
-                    slug=slug
-                )
-                ingredient_instance.save()
+                if name:
+                    tag_instance = Tag(
+                        name=name,
+                        color=color,
+                        slug=slug
+                    )
+                    tag_instance.save()
 
         self.stdout.write(self.style.SUCCESS('Данные успешно импортированы'))
