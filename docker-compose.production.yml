@@ -32,9 +32,6 @@ services:
   gateway:
     image: pygeorge007/foodgram_gateway
     env_file: .env
-    depends_on:
-      - backend
-      - frontend
     volumes:
       - static:/staticfiles/
       - media:/app/media/
@@ -42,4 +39,6 @@ services:
       - redoc:/usr/share/nginx/html/api/docs/
     ports:
       - 6000:80
-
+    depends_on:
+      - backend
+      - frontend
