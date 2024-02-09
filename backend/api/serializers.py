@@ -179,6 +179,11 @@ class RecipeSerializer(serializers.ModelSerializer):
         return False
 
     def validate(self, data):
+        self.first_validate(data)
+        self.second_validate(data)
+        return data
+
+    def first_validate(self, data):
         user = self.context.get('request').user
         if user.is_anonymous:
             raise AuthenticationFailed(
@@ -195,7 +200,8 @@ class RecipeSerializer(serializers.ModelSerializer):
             raise ValidationError(
                 'Один или несколько указанных тегов не существуют'
             )
-        tags = Tag.objects.filter(id__in=tags_ids)
+
+    def second_validate(self, data):
         ingredients = self.initial_data.get('ingredients')
         if not ingredients:
             raise ValidationError(
@@ -219,6 +225,7 @@ class RecipeSerializer(serializers.ModelSerializer):
         ingredient_objects = Ingredient.objects.filter(
             pk__in=valid_ingredients.keys()
         )
+        tags = Tag.objects.filter(id__in=self.initial_data.get('tags'))
         for ingredient_object in ingredient_objects:
             valid_ingredients[ingredient_object.pk] = (
                 ingredient_object, valid_ingredients[ingredient_object.pk])
