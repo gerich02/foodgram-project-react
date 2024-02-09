@@ -9,6 +9,7 @@ from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.response import Response
 
 from api.filters import IngredientFilter, RecipeFilter
+from api.pagination import CustomPagination
 from api.permissions import IsOwnerOrAdminOrReadOnly
 from api.serializers import (IngredientSerializer, RecipeSerializer,
                              SpecialRecipeSerializer,
@@ -111,7 +112,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     queryset = Recipe.objects.all()
     permission_classes = (IsOwnerOrAdminOrReadOnly,)
     serializer_class = RecipeSerializer
-    pagination_class = LimitOffsetPagination
+    pagination_class = CustomPagination
     filterset_class = RecipeFilter
     filter_backends = (DjangoFilterBackend,)
 
