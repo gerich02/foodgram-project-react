@@ -41,5 +41,5 @@ services:
       - ./docs/:/usr/share/nginx/html/api/docs/
       - redoc:/usr/share/nginx/html/api/docs/
     ports:
-      - 9090:80
+      - 6000:80
 
