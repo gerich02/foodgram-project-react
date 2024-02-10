@@ -9,7 +9,8 @@ from rest_framework.response import Response
 
 from api.filters import IngredientFilter, RecipeFilter
 from api.pagination import CustomPagination
-from api.permissions import IsOwnerOrAdminOrReadOnly
+from api.permissions import (IsOwnerOrAdminOrReadOnly,
+                             IsSafeMethodOrAuthenticated)
 from api.serializers import (IngredientSerializer, RecipeSerializer,
                              SpecialRecipeSerializer,
                              SubscriptionDataSerializer,
@@ -44,6 +45,7 @@ class CustomUserViewSet(UserViewSet):
     queryset = CustomUser.objects.all()
     serializer_class = UserInfoSerializer
     pagination_class = CustomPagination
+    permission_classes = [IsSafeMethodOrAuthenticated]
 
     @action(
         detail=True,
