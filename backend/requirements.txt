@@ -11,6 +11,7 @@ coreschema==0.0.4
 cryptography==42.0.2
 defusedxml==0.8.0rc2
 Django==3.2.3
+django-colorfield==0.11.0
 django-extensions==3.2.3
 django-filter==23.5
 django-templated-mail==1.1.1
@@ -49,6 +50,7 @@ social-auth-core==4.5.2
 sqlparse==0.4.4
 terminaltables==3.1.10
 tomli==2.0.1
+tqdm==4.66.2
 typing_extensions==4.9.0
 uritemplate==4.1.1
 urllib3==2.2.0

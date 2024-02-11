@@ -18,7 +18,7 @@ from api.serializers import (IngredientSerializer, RecipeSerializer,
                              UserInfoSerializer)
 from recipes.models import (Favorite, Ingredient, Recipe, RecipeIngredient,
                             ShoppingCart, Tag)
-from users.models import CustomUser, Follow
+from users.models import Follow, User
 
 
 class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
@@ -39,10 +39,10 @@ class TagViewSet(viewsets.ReadOnlyModelViewSet):
     pagination_class = None
 
 
-class CustomUserViewSet(UserViewSet):
+class UserViewSet(UserViewSet):
     """Вьюсет для модели пользователя."""
 
-    queryset = CustomUser.objects.all()
+    queryset = User.objects.all()
     serializer_class = UserInfoSerializer
     pagination_class = CustomPagination
     permission_classes = [IsSafeMethodOrAuthenticated]
@@ -54,7 +54,7 @@ class CustomUserViewSet(UserViewSet):
     )
     def subscribe(self, request, **kwargs):
         following = get_object_or_404(
-            CustomUser,
+            User,
             id=self.kwargs.get('id'),
         )
         data = {'user': request.user.id, 'following': following.id}
@@ -87,7 +87,7 @@ class CustomUserViewSet(UserViewSet):
     @action(detail=False, permission_classes=[permissions.IsAuthenticated])
     def subscriptions(self, request):
         user = request.user
-        queryset = CustomUser.objects.filter(following__user=user)
+        queryset = User.objects.filter(following__user=user)
         pages = self.paginate_queryset(queryset)
         serializer = SubscriptionSerializer(
             pages,

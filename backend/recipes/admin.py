@@ -20,6 +20,21 @@ class RecipeIngredientInline(admin.TabularInline):
     min_num = 1
 
 
+class TagInline(admin.TabularInline):
+    """
+    Встроенная административная форма для тэгов рецепта.
+
+    Атрибуты:
+        model (models.Model): Модель, связанная с встроенной формой.
+        extra (int): Количество дополнительных пустых форм.
+        min_num (int): Минимальное количество форм.
+    """
+
+    model = Recipe.tags.through
+    extra = 0
+    min_num = 1
+
+
 @admin.register(Ingredient)
 class IngredientAdmin(BaseAdmin):
     """
@@ -66,7 +81,7 @@ class RecipeAdmin(BaseAdmin):
         list_filter (tuple): Поля, доступные для фильтрации списка.
     """
 
-    inlines = (RecipeIngredientInline,)
+    inlines = (RecipeIngredientInline, TagInline)
     list_display = (
         'name',
         'text',

@@ -12,7 +12,7 @@ from rest_framework.validators import UniqueTogetherValidator
 from api.constants import (MAX_INGREDIENT_AMOUNT, MIN_INGREDIENT_AMOUNT,
                            MIN_INGREDIENT_REQUIRED, MIN_TAG_REQUIRED)
 from recipes.models import Ingredient, Recipe, RecipeIngredient, Tag
-from users.models import CustomUser, Follow
+from users.models import Follow, User
 
 
 class Base64ImageField(serializers.ImageField):
@@ -90,7 +90,7 @@ class UserCreateSerializer(UserCreateSerializer):
     """Сериализатор для создания пользователя."""
 
     class Meta:
-        model = CustomUser
+        model = User
         fields = (
             'id',
             'email',
@@ -109,7 +109,7 @@ class UserInfoSerializer(UserCreateSerializer):
     is_subscribed = serializers.SerializerMethodField()
 
     class Meta:
-        model = CustomUser
+        model = User
         fields = (
             'id',
             'email',
@@ -297,7 +297,7 @@ class SubscriptionSerializer(UserInfoSerializer):
     recipes_count = serializers.ReadOnlyField(source='recipes.count')
 
     class Meta:
-        model = CustomUser
+        model = User
         fields = (
             *UserInfoSerializer.Meta.fields,
             'recipes',

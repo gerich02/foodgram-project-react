@@ -38,7 +38,7 @@ sudo sh ./get-docker.sh
 sudo apt install docker-compose-plugin 
 ```
 
-4. В проекте foodgram есть несколько "секретных" переменных в файле main.yml, необходимых для автоматизации процесса, храниться они будут в "секретах" Вашего репозитория на гитхабе. Чтобы их объявить на GitHub в Вашем репозитории kittygram final идём во вкладку __Settings__,выберите на панели слева __Secets and variables__/__Actions__, нажмите __New repository secret__.
+4. В проекте foodgram есть несколько "секретных" переменных в файле main.yml, необходимых для автоматизации процесса, храниться они будут в "секретах" Вашего репозитория на гитхабе. Чтобы их объявить на GitHub в Вашем репозитории foodgram-project-react идём во вкладку __Settings__,выберите на панели слева __Secets and variables__/__Actions__, нажмите __New repository secret__.
 Вам необходимо добавить такие переменные как:
 - **DOCKER_USERNAME** = <Ваш логин на DockerHub>
 - **DOCKER_PASSWORD** = <Ваш пароль на DockerHub>
@@ -67,7 +67,7 @@ git add .
 git commit -m 'Ваш коммит'
 git push
 ```
-7. Проверяем работу автоматизации через вкладку **Actions** Вашего репозитория kittygram_final
+7. Проверяем работу автоматизации через вкладку **Actions** Вашего репозитория foodgram-project-react
 
 
 ## Об авторе

@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 
 from api.constants import PAGE_LIMIT
-from users.models import CustomUser, Follow
+from users.models import Follow, User
 
 
 class BaseAdmin(admin.ModelAdmin):
@@ -12,8 +12,8 @@ class BaseAdmin(admin.ModelAdmin):
     list_per_page = PAGE_LIMIT
 
 
-@admin.register(CustomUser)
-class CustomUserAdmin(UserAdmin):
+@admin.register(User)
+class UserAdmin(UserAdmin):
     """Класс для настройки административного интерфейса пользователей."""
 
     list_display = (

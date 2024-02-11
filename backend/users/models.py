@@ -1,11 +1,12 @@
 from django.contrib.auth.models import AbstractUser
-from django.core.validators import RegexValidator
 from django.db import models
 
-from api.constants import USER_VALID_MESSAGE, USERS_NAME_EMAIL_PASS_MAX_LENGTH
+from api.constants import USERS_NAME_EMAIL_PASS_MAX_LENGTH
+from users.validators import (username_not_me_validator,
+                              username_symbols_validator)
 
 
-class CustomUser(AbstractUser):
+class User(AbstractUser):
     """Модель пользователя."""
 
     USERNAME_FIELD = 'email'
@@ -16,10 +17,8 @@ class CustomUser(AbstractUser):
         max_length=USERS_NAME_EMAIL_PASS_MAX_LENGTH,
         unique=True,
         validators=[
-            RegexValidator(
-                regex=r'^[\w.@+-]+\Z',
-                message=USER_VALID_MESSAGE,
-            ),
+            username_symbols_validator,
+            username_not_me_validator
         ]
     )
     first_name = models.CharField(
@@ -47,13 +46,13 @@ class Follow(models.Model):
     """Модель подписки."""
 
     user = models.ForeignKey(
-        CustomUser,
+        User,
         on_delete=models.CASCADE,
         related_name='follower',
         verbose_name='Пользователь'
     )
     following = models.ForeignKey(
-        CustomUser,
+        User,
         on_delete=models.CASCADE,
         related_name='following',
         verbose_name='Автор рецепта'

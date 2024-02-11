@@ -11,3 +11,7 @@ MIN_TAG_REQUIRED = 1
 MIN_INGREDIENT_REQUIRED = 1
 PAGE_SIZE = 6
 PAGE_SIZE_QUERY_PARAM = 'limit'
+USERNAME_NOT_ME_ERR_MESSAGE = "Имя пользователя не может быть 'me'"
+DEFAULT_HEX_COLOR = '#FFFFFF'
+INGREDIENT_DATA_ROUTE = 'data/ingredients.csv'
+TAG_DATA_ROUTE = 'data/tags.csv'

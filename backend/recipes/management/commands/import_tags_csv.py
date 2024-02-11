@@ -1,7 +1,9 @@
 import csv
 
 from django.core.management.base import BaseCommand
+from tqdm import tqdm
 
+from api.constants import TAG_DATA_ROUTE
 from recipes.models import Tag
 
 
@@ -13,12 +15,24 @@ class Command(BaseCommand):
         help (str): Справочное сообщение о назначении команды.
     """
 
-    help = 'Ипорт данных из csv файла в бд'
+    help = 'Импорт данных из csv файла в бд'
 
     def handle(self, *args, **kwargs):
-        with open('data/tags.csv', encoding='utf-8') as file:
+        # Подсчет количества строк в файле
+        with open(TAG_DATA_ROUTE, encoding='utf-8') as file:
+            num_lines = sum(1 for line in file)
+
+        # Открытие файла снова для чтения данных и импорта
+        with open(TAG_DATA_ROUTE, encoding='utf-8') as file:
             reader = csv.reader(file)
-            for row in reader:
+            # Использование tqdm с флагом total
+            for row in tqdm(
+                reader,
+                total=num_lines,
+                ncols=80,
+                ascii=True,
+                desc='Total'
+            ):
                 name = row[0]
                 color = row[1]
                 slug = row[2] if len(row) > 2 else None
